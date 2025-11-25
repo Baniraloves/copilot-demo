@@ -16,6 +16,9 @@ function App() {
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [newTodoDescription, setNewTodoDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // Todoリストを取得
   const fetchTodos = async () => {
@@ -102,6 +105,50 @@ function App() {
     }
   };
 
+  // Todoの編集を開始
+  const startEdit = (todo: Todo) => {
+    setEditingId(todo.id);
+    setEditTitle(todo.title);
+    setEditDescription(todo.description || "");
+  };
+
+  // Todoの編集を保存
+  const saveEdit = async () => {
+    if (!editTitle.trim() || editingId === null) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          description: editDescription || null,
+        }),
+      });
+
+      if (response.ok) {
+        setEditingId(null);
+        setEditTitle("");
+        setEditDescription("");
+        await fetchTodos();
+      }
+    } catch (error) {
+      console.error("Failed to update todo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Todoの編集をキャンセル
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditDescription("");
+  };
+
   return (
     <div className="app">
       <h1>📝 Todo App</h1>
@@ -115,7 +162,7 @@ function App() {
             value={newTodoTitle}
             onChange={(e) => setNewTodoTitle(e.target.value)}
             className="input-title"
-            disabled={loading}
+            disabled={loading || editingId !== null}
           />
           <input
             type="text"
@@ -123,10 +170,10 @@ function App() {
             value={newTodoDescription}
             onChange={(e) => setNewTodoDescription(e.target.value)}
             className="input-description"
-            disabled={loading}
+            disabled={loading || editingId !== null}
           />
         </div>
-        <button type="submit" disabled={loading || !newTodoTitle.trim()}>
+        <button type="submit" disabled={loading || !newTodoTitle.trim() || editingId !== null}>
           {loading ? "追加中..." : "追加"}
         </button>
       </form>
@@ -141,29 +188,80 @@ function App() {
             {todos.map((todo) => (
               <li
                 key={todo.id}
-                className={`todo-item ${todo.completed ? "completed" : ""}`}
+                className={`todo-item ${todo.completed ? "completed" : ""} ${editingId === todo.id ? "editing" : ""}`}
               >
-                <div className="todo-content">
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo)}
-                    className="todo-checkbox"
-                  />
-                  <div className="todo-text">
-                    <h3>{todo.title}</h3>
-                    {todo.description && (
-                      <p className="todo-description">{todo.description}</p>
-                    )}
+                {editingId === todo.id ? (
+                  <div className="edit-form">
+                    <div className="edit-inputs">
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="input-title"
+                        placeholder="タイトルを入力..."
+                      />
+                      <input
+                        type="text"
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="input-description"
+                        placeholder="説明 (オプション)"
+                      />
+                    </div>
+                    <div className="edit-actions">
+                      <button
+                        onClick={saveEdit}
+                        className="save-btn"
+                        disabled={!editTitle.trim() || loading}
+                      >
+                        {loading ? "保存中..." : "保存"}
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="cancel-btn"
+                        disabled={loading}
+                      >
+                        キャンセル
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <button
-                  onClick={() => deleteTodo(todo.id)}
-                  className="delete-btn"
-                  aria-label="削除"
-                >
-                  🗑️
-                </button>
+                ) : (
+                  <>
+                    <div className="todo-content">
+                      <input
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={() => toggleTodo(todo)}
+                        className="todo-checkbox"
+                        disabled={editingId !== null}
+                      />
+                      <div className="todo-text">
+                        <h3>{todo.title}</h3>
+                        {todo.description && (
+                          <p className="todo-description">{todo.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="todo-actions">
+                      <button
+                        onClick={() => startEdit(todo)}
+                        className="edit-btn"
+                        aria-label="編集"
+                        disabled={editingId !== null}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => deleteTodo(todo.id)}
+                        className="delete-btn"
+                        aria-label="削除"
+                        disabled={editingId !== null}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </>
+                )}
               </li>
             ))}
           </ul>

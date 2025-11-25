@@ -108,4 +108,108 @@ test.describe("Todo App E2E Tests", () => {
     await page.getByPlaceholder("タイトルを入力...").fill("   ");
     await expect(addButton).toBeDisabled();
   });
+
+  test("Todoを編集できる", async ({ page }) => {
+    // まずTodoを追加
+    await page.getByPlaceholder("タイトルを入力...").fill("編集前のタイトル");
+    await page.getByPlaceholder("説明 (オプション)").fill("編集前の説明");
+    await page.getByRole("button", { name: "追加" }).click();
+
+    // Todoが追加されるのを待つ
+    await expect(page.getByText("編集前のタイトル")).toBeVisible();
+
+    // 編集ボタンをクリック
+    await page.getByRole("button", { name: "編集" }).first().click();
+
+    // 編集フォームが表示されることを確認
+    const titleInput = page
+      .locator(".edit-form input.input-title")
+      .first();
+    const descInput = page
+      .locator(".edit-form input.input-description")
+      .first();
+
+    await expect(titleInput).toBeVisible();
+    await expect(descInput).toBeVisible();
+
+    // 値を編集
+    await titleInput.clear();
+    await titleInput.fill("編集後のタイトル");
+    await descInput.clear();
+    await descInput.fill("編集後の説明");
+
+    // 保存ボタンをクリック
+    await page.getByRole("button", { name: "保存" }).click();
+
+    // 編集内容が反映されることを確認
+    await expect(page.getByText("編集後のタイトル")).toBeVisible();
+    await expect(page.getByText("編集後の説明")).toBeVisible();
+    await expect(page.getByText("編集前のタイトル")).not.toBeVisible();
+  });
+
+  test("Todo編集をキャンセルできる", async ({ page }) => {
+    // まずTodoを追加
+    await page.getByPlaceholder("タイトルを入力...").fill("キャンセルテスト");
+    await page.getByRole("button", { name: "追加" }).click();
+
+    // Todoが追加されるのを待つ
+    await expect(page.getByText("キャンセルテスト")).toBeVisible();
+
+    // 編集ボタンをクリック
+    await page.getByRole("button", { name: "編集" }).first().click();
+
+    // 編集フォームが表示されることを確認
+    const titleInput = page
+      .locator(".edit-form input.input-title")
+      .first();
+    await expect(titleInput).toBeVisible();
+
+    // 値を変更
+    await titleInput.clear();
+    await titleInput.fill("変更したタイトル");
+
+    // キャンセルボタンをクリック
+    await page.getByRole("button", { name: "キャンセル" }).click();
+
+    // 元のタイトルが表示されることを確認
+    await expect(page.getByText("キャンセルテスト")).toBeVisible();
+    await expect(page.getByText("変更したタイトル")).not.toBeVisible();
+  });
+
+  test("編集中は他のTodoの操作ができない", async ({ page }) => {
+    // 2つのTodoを追加
+    await page.getByPlaceholder("タイトルを入力...").fill("Todo 1");
+    await page.getByRole("button", { name: "追加" }).click();
+    await page.waitForTimeout(500);
+
+    await page.getByPlaceholder("タイトルを入力...").fill("Todo 2");
+    await page.getByRole("button", { name: "追加" }).click();
+    await page.waitForTimeout(500);
+
+    // 最初のTodoの編集ボタンをクリック
+    await page.getByRole("button", { name: "編集" }).first().click();
+
+    // 追加フォームが無効化されていることを確認
+    await expect(page.getByRole("button", { name: "追加" })).toBeDisabled();
+
+    // 他のTodoの編集・削除ボタンが無効化されていることを確認
+    const editButtons = await page.getByRole("button", { name: "編集" }).all();
+    const deleteButtons = await page
+      .getByRole("button", { name: "削除" })
+      .all();
+
+    for (const button of editButtons) {
+      await expect(button).toBeDisabled();
+    }
+
+    for (const button of deleteButtons) {
+      await expect(button).toBeDisabled();
+    }
+
+    // チェックボックスも無効化されていることを確認
+    const checkboxes = await page.getByRole("checkbox").all();
+    for (const checkbox of checkboxes) {
+      await expect(checkbox).toBeDisabled();
+    }
+  });
 });
