@@ -1,0 +1,40 @@
+name: Feature Request
+description: 新機能の提案
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 機能リクエスト
+        新しい機能の提案をお願いします。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 機能の説明
+      description: どのような機能を追加したいですか?
+      placeholder: "例: Todoに期限を設定できるようにしたい"
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: 要件
+      description: 具体的な要件を箇条書きで記載してください
+      placeholder: |
+        - 期限を設定できる
+        - 期限切れのTodoをハイライト表示
+        - 期限順でソートできる
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 追加情報
+      description: 参考になる情報があれば記載してください
+      placeholder: "関連ファイル、参考資料など"
+    validations:
+      required: false
