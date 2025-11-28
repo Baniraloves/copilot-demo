@@ -230,7 +230,7 @@ test.describe("Todo App E2E Tests", () => {
 
     // Todoが追加されたことを確認
     await expect(page.getByRole("heading", { level: 3 }).filter({ hasText: "優先度付きタスク" })).toBeVisible();
-    await expect(page.getByText("📅 2025/12/31")).toBeVisible();
+    await expect(page.getByText(/📅 2025\/12\/31/)).toBeVisible();
     await expect(page.locator(".todo-item").filter({ hasText: "優先度付きタスク" }).getByText("🔴 高")).toBeVisible();
   });
 
@@ -322,7 +322,7 @@ test.describe("Todo App E2E Tests", () => {
     await page.getByRole("button", { name: "保存" }).click();
 
     // 編集内容が反映されることを確認
-    await expect(todoItem.getByText("📅 2025/12/25")).toBeVisible();
+    await expect(todoItem.getByText(/📅 2025\/12\/25/)).toBeVisible();
     await expect(todoItem.locator(".priority").filter({ hasText: "🔴 高" })).toBeVisible();
   });
 });

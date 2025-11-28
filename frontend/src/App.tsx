@@ -217,14 +217,14 @@ function App() {
         return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
       });
     } else if (sortBy === "priority") {
-      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const priorityOrder: { [key: string]: number } = { high: 0, medium: 1, low: 2 };
       sortedTodos.sort((a, b) => {
-        const aPriority = a.priority as keyof typeof priorityOrder;
-        const bPriority = b.priority as keyof typeof priorityOrder;
         if (!a.priority && !b.priority) return 0;
         if (!a.priority) return 1;
         if (!b.priority) return -1;
-        return priorityOrder[aPriority] - priorityOrder[bPriority];
+        const aPriorityValue = priorityOrder[a.priority] ?? 3;
+        const bPriorityValue = priorityOrder[b.priority] ?? 3;
+        return aPriorityValue - bPriorityValue;
       });
     }
     
