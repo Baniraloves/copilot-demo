@@ -29,8 +29,15 @@ h1 {
   gap: 0.5rem;
 }
 
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .input-title,
-.input-description {
+.input-description,
+.input-date,
+.input-priority {
   padding: 0.75rem;
   border: 2px solid #333;
   border-radius: 8px;
@@ -41,13 +48,29 @@ h1 {
 }
 
 .input-title:focus,
-.input-description:focus {
+.input-description:focus,
+.input-date:focus,
+.input-priority:focus {
   outline: none;
   border-color: #646cff;
 }
 
 .input-description {
   font-size: 0.9rem;
+}
+
+.input-date,
+.input-priority {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.input-date {
+  color-scheme: dark;
+}
+
+.input-priority {
+  cursor: pointer;
 }
 
 button[type="submit"] {
@@ -75,6 +98,44 @@ button[type="submit"]:disabled {
 
 .todos-container {
   margin-bottom: 2rem;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  border: 2px solid #333;
+}
+
+.sort-controls label {
+  color: #aaa;
+  font-weight: 600;
+}
+
+.sort-controls button {
+  padding: 0.5rem 1rem;
+  background-color: #2a2a2a;
+  color: #aaa;
+  border: 2px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.sort-controls button:hover {
+  border-color: #646cff;
+  color: white;
+}
+
+.sort-controls button.active {
+  background-color: #646cff;
+  border-color: #646cff;
+  color: white;
 }
 
 .empty-message {
@@ -119,6 +180,15 @@ button[type="submit"]:disabled {
   background-color: #252525;
 }
 
+.todo-item.overdue {
+  border-color: #ff4444;
+  background-color: #2a1a1a;
+}
+
+.todo-item.overdue:hover {
+  border-color: #ff6666;
+}
+
 .todo-content {
   display: flex;
   align-items: center;
@@ -148,6 +218,26 @@ button[type="submit"]:disabled {
   font-size: 0.9rem;
   color: #aaa;
   margin: 0;
+}
+
+.todo-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.todo-meta .due-date,
+.todo-meta .priority {
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.todo-item.overdue .todo-meta .due-date {
+  color: #ff4444;
+  font-weight: 600;
 }
 
 .todo-actions {
@@ -253,20 +343,36 @@ button[type="submit"]:disabled {
 
 @media (prefers-color-scheme: light) {
   .input-title,
-  .input-description {
+  .input-description,
+  .input-date,
+  .input-priority {
     background-color: white;
     color: #213547;
     border-color: #ddd;
   }
 
+  .input-date {
+    color-scheme: light;
+  }
+
   .todo-item,
-  .stats {
+  .stats,
+  .sort-controls {
     background-color: #f9f9f9;
     border-color: #ddd;
   }
 
   .todo-item:hover {
     border-color: #646cff;
+  }
+
+  .sort-controls button {
+    background-color: white;
+    color: #213547;
+  }
+
+  .todo-item.overdue {
+    background-color: #fff5f5;
   }
 }
 

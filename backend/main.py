@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
 
 app = FastAPI(title="Todo API", version="1.0.0")
 
@@ -20,6 +20,8 @@ class TodoBase(BaseModel):
     title: str
     description: Optional[str] = None
     completed: bool = False
+    due_date: Optional[date] = None
+    priority: Optional[str] = None
 
 class TodoCreate(TodoBase):
     pass
@@ -28,6 +30,8 @@ class TodoUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     completed: Optional[bool] = None
+    due_date: Optional[date] = None
+    priority: Optional[str] = None
 
 class Todo(TodoBase):
     id: int
@@ -63,6 +67,8 @@ def create_todo(todo: TodoCreate):
         title=todo.title,
         description=todo.description,
         completed=todo.completed,
+        due_date=todo.due_date,
+        priority=todo.priority,
         created_at=datetime.now()
     )
     todos_db.append(new_todo)
